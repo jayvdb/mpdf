@@ -8,14 +8,23 @@ php:
   - nightly
 
 matrix:
+  include:
+    - env: LINT=1
+      php: 5.6
+
   allow_failures:
-    php:
-      - hhvm
-      - nightly
+    - php: nightly
+    - env: LINT=1
 
 install:
   - composer self-update
   - composer install
+
+script:
+  - |
+    if [[ "$LINT" == "1" ]]; then
+      ./vendor/bin/phpcs -v --report-width=160 --standard=.phpcs_ruleset.xml --severity=1 --warning-severity=0 --extensions=php,inc src utils
+    fi
 
 notifications:
   email: change
